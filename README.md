@@ -54,7 +54,6 @@ thinking, log correlation, and effective communication of technical findings.
   <li>Brute-force login attempts</li>
   <li>Malware beaconing network traffic</li>
 </ul>
-<p><img src="images/siem-alert-overview.png" alt="SIEM Alert Overview" width="850"></p>
 
 <h3>🔹 Step 2: Scope Identification & Data Collection</h3>
 <ul>
@@ -68,7 +67,7 @@ thinking, log correlation, and effective communication of technical findings.
   <li>Process creation and command-line logs</li>
   <li>Network traffic logs</li>
 </ul>
-<p><i>📸 Ref 2: Log Event Analysis</i></p>
+
 
 <h3>🔹 Step 3: Detailed Log Analysis</h3>
 <ul>
@@ -77,7 +76,7 @@ thinking, log correlation, and effective communication of technical findings.
   <li>Network connection pattern analysis</li>
   <li>Cross-log event correlation</li>
 </ul>
-<p><i>📸 Ref 3: Correlated Event View</i></p>
+
 
 <h3>🔹 Step 4: Timeline Construction</h3>
 <ul>
@@ -86,7 +85,7 @@ thinking, log correlation, and effective communication of technical findings.
   <li>Persistence or escalation attempts</li>
   <li>End of malicious activity</li>
 </ul>
-<p><i>📸 Ref 4: Incident Timeline</i></p>
+
 
 <h3>🔹 Step 5: IOC Identification & Enrichment</h3>
 <ul>
@@ -100,7 +99,7 @@ thinking, log correlation, and effective communication of technical findings.
   <li>Known malicious activity</li>
   <li>Campaign association</li>
 </ul>
-<p><i>📸 Ref 5: IOC Enrichment Results</i></p>
+
 
 <h3>🔹 Step 6: Root Cause Analysis</h3>
 <ul>
@@ -108,7 +107,6 @@ thinking, log correlation, and effective communication of technical findings.
   <li>Weak controls or misconfigurations</li>
   <li>Attacker techniques and objectives</li>
 </ul>
-<p><i>📸 Ref 6: Root Cause Findings</i></p>
 
 <h3>🔹 Step 7: Incident Documentation & Reporting</h3>
 <ul>
@@ -121,7 +119,7 @@ thinking, log correlation, and effective communication of technical findings.
   <li>Remediation recommendations</li>
   <li>Lessons learned</li>
 </ul>
-<p><i>📸 Ref 7: Incident Report Summary</i></p>
+
 
 <hr>
 
