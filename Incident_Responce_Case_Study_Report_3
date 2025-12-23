@@ -1,0 +1,230 @@
+<h1>🚨 Incident Response Case Study 3</h1>
+
+<h2>Case Type: Malware Beaconing Traffic</h2>
+
+<p><strong>SOC Analyst:</strong> Parvathy Krishnan<br>
+<strong>Environment:</strong> SOC Home Lab<br>
+<strong>SIEM:</strong> Splunk</p>
+
+<hr>
+
+<h2>1. Executive Summary</h2>
+<p>
+During continuous SOC monitoring, a high-severity SIEM alert was triggered indicating
+suspicious periodic outbound network traffic from a Windows endpoint. The behavior
+was consistent with malware beaconing, commonly used by compromised hosts to
+communicate with command-and-control (C2) servers.
+</p>
+
+<p><strong>Investigation Objectives:</strong></p>
+<ul>
+  <li>Identify whether the traffic represented malicious C2 communication</li>
+  <li>Determine the scope and impact of the activity</li>
+  <li>Identify Indicators of Compromise (IOCs)</li>
+  <li>Recommend remediation and containment actions</li>
+</ul>
+
+<p>
+Following analysis, the activity was confirmed as malware beaconing and classified
+as a <strong>True Positive</strong>.
+</p>
+
+<hr>
+
+<h2>2. Detection & Alert Context</h2>
+
+<h3>Alert Information</h3>
+<ul>
+  <li><strong>Alert Name:</strong> Suspicious Beaconing Network Traffic</li>
+  <li><strong>Severity:</strong> High</li>
+  <li><strong>Detection Source:</strong> Splunk SIEM</li>
+  <li><strong>Affected Host:</strong> WIN10-ENDPOINT-01</li>
+  <li><strong>Source IP:</strong> 192.168.1.101</li>
+  <li><strong>Destination IP:</strong> 185.203.118.45</li>
+  <li><strong>Protocol:</strong> TCP</li>
+  <li><strong>Destination Port:</strong> 443</li>
+</ul>
+
+<h3>Why This Alert Matters</h3>
+<ul>
+  <li>Active malware infection</li>
+  <li>Ongoing C2 communication</li>
+  <li>Potential data exfiltration</li>
+</ul>
+
+<hr>
+
+<h2>3. Initial Triage & Validation</h2>
+
+<h3>Actions Taken</h3>
+<ul>
+  <li>Validated alert source and timestamp</li>
+  <li>Confirmed alert accuracy</li>
+  <li>Identified affected endpoint</li>
+  <li>Checked for spread across other hosts</li>
+</ul>
+
+<h3>Splunk Query – Alert Validation</h3>
+<pre>
+index=network_logs dest_ip=185.203.118.45
+| stats count by src_ip, dest_ip
+</pre>
+
+<h3>Initial Findings</h3>
+<ul>
+  <li>Activity isolated to one endpoint</li>
+  <li>Consistent traffic intervals</li>
+  <li>No legitimate business justification</li>
+</ul>
+
+<hr>
+
+<h2>4. Data Collection & Log Analysis</h2>
+
+<h3>Log Sources Reviewed</h3>
+<ul>
+  <li>Network Traffic Logs</li>
+  <li>Windows Security Logs</li>
+  <li>Sysmon Network Connection Logs</li>
+  <li>DNS Logs</li>
+</ul>
+
+<h3>Splunk Query – Periodic Connections</h3>
+<pre>
+index=network_logs src_ip=192.168.1.101
+| bucket _time span=5m
+| stats count by _time, dest_ip
+| where count > 5
+</pre>
+
+<h3>Key Observations</h3>
+<ul>
+  <li>Connections every 60 seconds</li>
+  <li>Consistent destination IP and port</li>
+  <li>Small uniform packet sizes</li>
+  <li>Encrypted traffic without valid application context</li>
+</ul>
+
+<hr>
+
+<h2>5. Beaconing Pattern & Behavior Analysis</h2>
+
+<h3>Behavioral Indicators</h3>
+<ul>
+  <li>Regular interval communication</li>
+  <li>Low data volume</li>
+  <li>No user interaction</li>
+  <li>Persistence after user logout</li>
+</ul>
+
+<h3>Splunk Query – Interval Analysis</h3>
+<pre>
+index=network_logs src_ip=192.168.1.101 dest_ip=185.203.118.45
+| sort _time
+| delta _time as time_diff
+| stats avg(time_diff) as avg_beacon_interval
+</pre>
+
+<p><strong>Result:</strong> Average beacon interval of <strong>60 seconds</strong></p>
+
+<hr>
+
+<h2>6. Timeline Reconstruction</h2>
+
+<table border="1" cellpadding="6">
+<tr><th>Time (UTC)</th><th>Event</th></tr>
+<tr><td>11:05</td><td>First outbound connection detected</td></tr>
+<tr><td>11:10</td><td>Repeated periodic traffic observed</td></tr>
+<tr><td>11:12</td><td>SIEM alert triggered</td></tr>
+<tr><td>11:15</td><td>SOC investigation initiated</td></tr>
+<tr><td>11:25</td><td>Beaconing confirmed</td></tr>
+<tr><td>11:40</td><td>Host identified as compromised</td></tr>
+<tr><td>11:55</td><td>Incident documented</td></tr>
+</table>
+
+<hr>
+
+<h2>7. Indicators of Compromise (IOCs)</h2>
+
+<table border="1" cellpadding="6">
+<tr><th>Type</th><th>Value</th></tr>
+<tr><td>Source IP</td><td>192.168.1.101</td></tr>
+<tr><td>Destination IP</td><td>185.203.118.45</td></tr>
+<tr><td>Destination Port</td><td>443</td></tr>
+<tr><td>Protocol</td><td>TCP</td></tr>
+<tr><td>Behavior</td><td>Periodic outbound connections</td></tr>
+</table>
+
+<hr>
+
+<h2>8. Scope & Impact Assessment</h2>
+
+<ul>
+  <li><strong>Affected Hosts:</strong> 1</li>
+  <li><strong>Affected Users:</strong> 1</li>
+  <li><strong>Lateral Movement:</strong> Not detected</li>
+</ul>
+
+<p><strong>Impact:</strong> Active C2 communication detected, no confirmed data exfiltration.</p>
+
+<hr>
+
+<h2>9. Root Cause Analysis</h2>
+
+<p>
+Malware infection on the endpoint established persistent outbound communication
+with a remote C2 server.
+</p>
+
+<h3>Contributing Factors</h3>
+<ul>
+  <li>No outbound traffic filtering</li>
+  <li>Lack of EDR controls</li>
+  <li>Limited application-level visibility</li>
+</ul>
+
+<hr>
+
+<h2>10. MITRE ATT&CK Mapping</h2>
+
+<table border="1" cellpadding="6">
+<tr><th>Tactic</th><th>Technique</th><th>ID</th></tr>
+<tr><td>Command and Control</td><td>Application Layer Protocol</td><td>T1071</td></tr>
+<tr><td>Command and Control</td><td>Web Protocols</td><td>T1071.001</td></tr>
+</table>
+
+<hr>
+
+<h2>11. Final Verdict</h2>
+<p><strong>True Positive – Confirmed Malware Beaconing Activity</strong></p>
+
+<hr>
+
+<h2>12. Remediation & Recommendations</h2>
+<ul>
+  <li>Isolate the affected host</li>
+  <li>Block malicious IP at firewall</li>
+  <li>Reimage or clean endpoint</li>
+  <li>Implement outbound monitoring</li>
+  <li>Deploy EDR solutions</li>
+</ul>
+
+<hr>
+
+<h2>13. Lessons Learned</h2>
+<ul>
+  <li>Beaconing is a strong compromise indicator</li>
+  <li>Network telemetry is critical</li>
+  <li>Interval analysis is highly effective</li>
+  <li>Early detection limits dwell time</li>
+</ul>
+
+<hr>
+
+<h2>14. Analyst Notes</h2>
+<ul>
+  <li>Effective use of network telemetry</li>
+  <li>Behavioral analysis over signatures</li>
+  <li>Accurate post-exploitation detection</li>
+  <li>Professional SOC documentation</li>
+</ul>
